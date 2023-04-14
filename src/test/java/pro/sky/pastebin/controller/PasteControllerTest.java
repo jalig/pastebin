@@ -1,9 +1,6 @@
 package pro.sky.pastebin.controller;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.json.JSONException;
-import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -13,7 +10,6 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.MediaType;
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.web.servlet.MockMvc;
-import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.testcontainers.junit.jupiter.Testcontainers;
 import pro.sky.pastebin.config.DockerConfig;
 import pro.sky.pastebin.dto.PasteDTO;
@@ -48,8 +44,6 @@ class PasteControllerTest extends DockerConfig {
     PasteStatus pasteStatus = PasteStatus.PUBLIC;
 
     TimePaste timePaste = TimePaste.TEN_MIN;
-    private JSONObject jsonObject;
-
 
     @BeforeEach
     void setUp() {
