@@ -2,6 +2,8 @@ package pro.sky.pastebin.controller;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -43,16 +45,23 @@ class PasteControllerTest extends DockerConfig {
 
     Paste paste;
 
+    PasteStatus pasteStatus = PasteStatus.PUBLIC;
+
+    TimePaste timePaste = TimePaste.TEN_MIN;
+    private JSONObject jsonObject;
+
+
     @BeforeEach
     void setUp() {
         paste = new Paste();
         paste.setUrl(UUID.randomUUID().toString());
         paste.setTitle("Title");
         paste.setBody("Body");
-        paste.setStatus(PasteStatus.PUBLIC);
+        paste.setStatus(pasteStatus);
         paste.setCreationTime(Instant.now());
-        paste.setExpiredTime(Instant.now().plus(TimePaste.ONE_DAY.getDuration()));
+        paste.setExpiredTime(Instant.now().plus(timePaste.getDuration()));
         pasteRepository.save(paste);
+
     }
 
     @AfterEach
@@ -65,16 +74,10 @@ class PasteControllerTest extends DockerConfig {
         mockMvc.perform(post("/my-awesome-pastebin")
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(PasteDTO.fromPaste(paste)))
-                        .content(objectMapper.writeValueAsString(TimePaste.TEN_MIN))
-                        .content(objectMapper.writeValueAsString(PasteStatus.PUBLIC))
-                )
-                .andExpect(status().isOk());
-//                .andExpect(jsonPath("$.url").value(paste.getUrl()))
-//                .andExpect(jsonPath("$.title").value(paste.getTitle()))
-//                .andExpect(jsonPath("$.body").value(paste.getBody()))
-//                .andExpect(jsonPath("$.status").value(paste.getStatus()))
-//                .andExpect(jsonPath("$.creationTime").value(paste.getCreationTime()))
-//                .andExpect(jsonPath("$.expiredTime").value(paste.getExpiredTime()));
+                        .param("timePaste", timePaste.toString())
+                        .param("pasteStatus", pasteStatus.toString()))
+                .andExpect(status().isOk())
+                .andExpect(jsonPath("$").isString());
     }
 
     @Test
@@ -84,9 +87,14 @@ class PasteControllerTest extends DockerConfig {
                 .andExpect(jsonPath("$").isArray());
     }
 
-//    @Test
-//    void findByUrl() {
-//    }
+    @Test
+    void findByUrl() throws Exception {
+        mockMvc.perform(get("/my-awesome-pastebin/" + paste.getUrl())
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(objectMapper.writeValueAsString(PasteDTO.fromPaste(paste))))
+                .andExpect(status().isOk());
+
+    }
 
     @Test
     void findByTitleOrBody() throws Exception {
