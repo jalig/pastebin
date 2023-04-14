@@ -3,6 +3,7 @@ package pro.sky.pastebin.repository.specification;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.util.StringUtils;
 import pro.sky.pastebin.model.Paste;
+import pro.sky.pastebin.model.enums.PasteStatus;
 
 public class PasteSpecification {
     public static Specification<Paste> byTitle(String title) {
@@ -11,7 +12,8 @@ public class PasteSpecification {
             if (!StringUtils.hasText(title)) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("title"), title);
+            criteriaBuilder.equal(root.get("title"), title);
+            return criteriaBuilder.equal(root.get("status"), PasteStatus.PUBLIC);
         };
 
     }
@@ -22,10 +24,14 @@ public class PasteSpecification {
             if (!StringUtils.hasText(body)) {
                 return criteriaBuilder.conjunction();
             }
-            return criteriaBuilder.equal(root.get("body"), body);
+            criteriaBuilder.equal(root.get("body"),  "%" + body + "%");
+            return criteriaBuilder.equal(root.get("status"), PasteStatus.PUBLIC);
         };
 
     }
+
+
+
 
 
 }
