@@ -4,6 +4,8 @@ import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
 import pro.sky.pastebin.dto.PasteDTO;
 import pro.sky.pastebin.dto.PasteView;
+import pro.sky.pastebin.exception.BadRequestException;
+import pro.sky.pastebin.exception.NotFoundException;
 import pro.sky.pastebin.model.Paste;
 import pro.sky.pastebin.model.enums.PasteStatus;
 import pro.sky.pastebin.model.enums.TimePaste;
@@ -40,6 +42,7 @@ public class PasteService {
     }
 
     public String createPaste(PasteDTO pasteDTO, TimePaste timePaste, PasteStatus pasteStatus) {
+        if (pasteDTO == null) throw new BadRequestException("Entity is null");
         Paste paste = pasteDTO.toPaste();
         paste.setUrl(generateRandomUrl());
         paste.setExpiredTime(Instant.now().plus(timePaste.getDuration()));
@@ -49,17 +52,24 @@ public class PasteService {
     }
 
     public List<PasteView> findAllPublicPaste() {
-        return pasteRepository.findTop10ByStatusAndExpiredTimeIsAfterOrderByCreationTimeDesc(PasteStatus.PUBLIC, Instant.now())
+        List<PasteView> pasts = pasteRepository
+                .findTop10ByStatusAndExpiredTimeIsAfterOrderByCreationTimeDesc(PasteStatus.PUBLIC, Instant.now())
                 .stream()
                 .map(PasteView::fromPaste)
                 .collect(Collectors.toList());
+        if (pasts.isEmpty()) throw new NotFoundException("Not found");
+        return pasts;
+
+
     }
 
     public PasteView findByUrl(String url) {
+        if (url == null || url.isBlank()) throw new NotFoundException("URL incorrect");
         return PasteView.fromPaste(pasteRepository.findAllByUrlLikeAndExpiredTimeIsAfter(url, Instant.now()));
     }
 
     public List<PasteView> findByTitleOrBody(String title, String body) {
+        if ((title == null || title.isBlank()) && (body == null || body.isBlank())) throw new NotFoundException("No matches");
         return pasteRepository.findAll(Specification.where(byTitle(title).and(byBody(body))))
                 .stream()
                 .map(PasteView::fromPaste)
