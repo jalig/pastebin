@@ -9,9 +9,9 @@ import pro.sky.pastebin.model.enums.PasteStatus;
 import pro.sky.pastebin.model.enums.TimePaste;
 import pro.sky.pastebin.repository.PasteRepository;
 
+import java.security.SecureRandom;
 import java.time.Instant;
 import java.util.List;
-import java.util.UUID;
 import java.util.stream.Collectors;
 
 import static pro.sky.pastebin.repository.specification.PasteSpecification.byBody;
@@ -26,28 +26,38 @@ public class PasteService {
         this.pasteRepository = pasteRepository;
     }
 
+    private static String generateRandomUrl() {
+        final String chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789";
+
+        SecureRandom random = new SecureRandom();
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0; i < 8; i++) {
+            int randomIndex = random.nextInt(chars.length());
+            sb.append(chars.charAt(randomIndex));
+        }
+        return sb.toString();
+    }
 
     public String createPaste(PasteDTO pasteDTO, TimePaste timePaste, PasteStatus pasteStatus) {
         Paste paste = pasteDTO.toPaste();
-        paste.setUrl(UUID.randomUUID().toString());
+        paste.setUrl(generateRandomUrl());
         paste.setExpiredTime(Instant.now().plus(timePaste.getDuration()));
         paste.setStatus(pasteStatus);
         pasteRepository.save(paste);
         return paste.getUrl();
     }
 
-
     public List<PasteView> findAllPublicPaste() {
-        return pasteRepository.findAllByStatusPublic()
+        return pasteRepository.findTop10ByStatusAndExpiredTimeIsAfterOrderByCreationTimeDesc(PasteStatus.PUBLIC, Instant.now())
                 .stream()
                 .map(PasteView::fromPaste)
                 .collect(Collectors.toList());
     }
 
     public PasteView findByUrl(String url) {
-        return PasteView.fromPaste(pasteRepository.findAllByUrlLike(url));
+        return PasteView.fromPaste(pasteRepository.findAllByUrlLikeAndExpiredTimeIsAfter(url, Instant.now()));
     }
-
 
     public List<PasteView> findByTitleOrBody(String title, String body) {
         return pasteRepository.findAll(Specification.where(byTitle(title).and(byBody(body))))
@@ -55,8 +65,5 @@ public class PasteService {
                 .map(PasteView::fromPaste)
                 .collect(Collectors.toList());
     }
-
-
-
 
 }

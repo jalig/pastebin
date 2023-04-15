@@ -19,6 +19,7 @@ public class PasteDTO {
     private String body;
     private String title;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
+    @Enumerated
     private Instant expiredTime;
     @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     @Enumerated(EnumType.STRING)
@@ -41,7 +42,7 @@ public class PasteDTO {
         paste.setUrl(this.getUrl());
         paste.setBody(this.getBody());
         paste.setTitle(this.getTitle());
-        paste.setExpiredTime(this.getExpiredTime());
+        paste.setExpiredTime(paste.getCreationTime());
         paste.setStatus(this.getStatus());
         return paste;
     }

@@ -9,8 +9,8 @@ import pro.sky.pastebin.model.Paste;
 public class PasteView {
 
     private String url;
-    private String body;
     private String title;
+    private String body;
 
 
 

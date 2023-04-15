@@ -87,7 +87,6 @@ class PasteControllerTest extends DockerConfig {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(objectMapper.writeValueAsString(PasteDTO.fromPaste(paste))))
                 .andExpect(status().isOk());
-
     }
 
     @Test
