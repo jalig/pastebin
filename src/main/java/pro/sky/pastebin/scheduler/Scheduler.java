@@ -22,7 +22,7 @@ public class Scheduler {
     @Scheduled(fixedRateString = "${pastebin.timer.rate-minutes}", timeUnit = TimeUnit.MINUTES)
     @Transactional
     public void clearTokens() {
-        log.info("Scheduler is work");
+        log.info("Removal of expired pastes");
         pasteRepository.deleteAllByExpiredTimeIsBefore(Instant.now());
     }
 }
