@@ -11,7 +11,7 @@ public class NotFoundControllerAdvice {
 
     @ExceptionHandler(NotFoundException.class)
     public ResponseEntity<?> notFound(){
-        return ResponseEntity.status(404).build();
+        return ResponseEntity.status(404).body("Not found");
     }
 
     @ExceptionHandler(BadRequestException.class)

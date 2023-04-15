@@ -1,5 +1,6 @@
 package pro.sky.pastebin.controller;
 
+import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
 import pro.sky.pastebin.dto.PasteDTO;
 import pro.sky.pastebin.dto.PasteView;
@@ -21,26 +22,43 @@ public class PasteController {
     }
 
     @PostMapping
+    @Operation(
+            summary = "Создание нового Paste",
+            description = "Создание нового Paste с заданным временем и статусом"
+    )
     public String createPaste(
             @RequestBody PasteDTO pasteDTO,
-            @RequestParam TimePaste timePaste,
-            @RequestParam PasteStatus pasteStatus
+            @RequestParam(value = "time paste") TimePaste timePaste,
+            @RequestParam(value = "paste status") PasteStatus pasteStatus
 
     ) {
-         return "http://my-awesome-pastebin.tld/" + pasteService.createPaste(pasteDTO, timePaste, pasteStatus);
+        String response = pasteService.createPaste(pasteDTO, timePaste, pasteStatus);
+        return "http://my-awesome-pastebin.tld/" + response;
     }
 
     @GetMapping(value = "/last-ten")
+    @Operation(
+            summary = "Получить информацию о 10 Paste",
+            description = "Получить информацию о 10 самых новых Paste"
+    )
     public List<PasteView> findAllPublic() {
         return pasteService.findAllPublicPaste();
     }
 
     @GetMapping(value = "/{url}")
+    @Operation(
+            summary = "Получить информацию о Paste по URL",
+            description = "Получить информацию о Paste по URL (который мы получаем при создании Paste)"
+    )
     public PasteView findByUrl(@PathVariable String url) {
         return pasteService.findByUrl(url);
     }
 
     @GetMapping
+    @Operation(
+            summary = "Получить информацию о Paste по title или body",
+            description = "Получить информацию о Paste по заголовку или телу Paste"
+    )
     public List<PasteView> findByTitleOrBody(
             @RequestParam(required = false) String title,
             @RequestParam(required = false) String body) {

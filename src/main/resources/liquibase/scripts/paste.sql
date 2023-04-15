@@ -4,7 +4,7 @@
 CREATE TABLE paste
 (
     url           VARCHAR(255) PRIMARY KEY,
-    body          VARCHAR(255) NOT NULL,
+    body          TEXT NOT NULL,
     creation_time timestamp    NOT NULL,
     expired_time  timestamp    NOT NULL,
     status        VARCHAR(255) NOT NULL,

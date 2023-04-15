@@ -69,11 +69,14 @@ public class PasteService {
     }
 
     public List<PasteView> findByTitleOrBody(String title, String body) {
-        if ((title == null || title.isBlank()) && (body == null || body.isBlank())) throw new NotFoundException("No matches");
-        return pasteRepository.findAll(Specification.where(byTitle(title).and(byBody(body))))
+        if ((title == null || title.isBlank()) && (body == null || body.isBlank()))
+            throw new NotFoundException("No matches");
+        List<PasteView> pasts = pasteRepository.findAll(Specification.where(byTitle(title).and(byBody(body))))
                 .stream()
                 .map(PasteView::fromPaste)
                 .collect(Collectors.toList());
+        if (pasts.isEmpty()) throw new NotFoundException("Not found");
+        return pasts;
     }
 
 }
