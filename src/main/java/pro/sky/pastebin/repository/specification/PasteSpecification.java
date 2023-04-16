@@ -5,7 +5,6 @@ import org.springframework.util.StringUtils;
 import pro.sky.pastebin.model.Paste;
 import pro.sky.pastebin.model.enums.PasteStatus;
 
-import javax.persistence.criteria.Predicate;
 import java.time.Instant;
 
 public class PasteSpecification {
@@ -16,12 +15,18 @@ public class PasteSpecification {
             if (!StringUtils.hasText(title)) {
                 return criteriaBuilder.conjunction();
             }
-            Predicate getTitle = criteriaBuilder.equal(root.get("title"), title);
-            Predicate expiredTime = criteriaBuilder.greaterThanOrEqualTo(root.get("expiredTime"), Instant.now());
-            Predicate status = criteriaBuilder.equal(root.get("status"), PasteStatus.PUBLIC);
-            return criteriaBuilder.and(getTitle, expiredTime, status);
+            return criteriaBuilder.equal(root.get("title"), title);
         };
+    }
 
+    public static Specification<Paste> byTime() {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.greaterThanOrEqualTo(root.get("expiredTime"), Instant.now());
+    }
+
+    public static Specification<Paste> byStatus() {
+        return (root, query, criteriaBuilder) ->
+                criteriaBuilder.equal(root.get("status"), PasteStatus.PUBLIC);
     }
 
     public static Specification<Paste> byBody(String body) {
@@ -30,13 +35,8 @@ public class PasteSpecification {
             if (!StringUtils.hasText(body)) {
                 return criteriaBuilder.conjunction();
             }
-            Predicate getBody = criteriaBuilder.like(root.get("body"), "%" + body + "%");
-            Predicate expiredTime = criteriaBuilder.greaterThanOrEqualTo(root.get("expiredTime"), Instant.now());
-            Predicate status = criteriaBuilder.equal(root.get("status"), PasteStatus.PUBLIC);
-            return criteriaBuilder.and(getBody, expiredTime, status);
+            return criteriaBuilder.like(root.get("body"), "%" + body + "%");
         };
-
     }
-
 
 }

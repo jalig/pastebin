@@ -2,10 +2,8 @@ package pro.sky.pastebin.controller;
 
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.web.bind.annotation.*;
-import pro.sky.pastebin.dto.PasteDTO;
+import pro.sky.pastebin.dto.CreatePaste;
 import pro.sky.pastebin.dto.PasteView;
-import pro.sky.pastebin.model.enums.PasteStatus;
-import pro.sky.pastebin.model.enums.TimePaste;
 import pro.sky.pastebin.service.PasteService;
 
 import java.util.List;
@@ -24,16 +22,12 @@ public class PasteController {
     @PostMapping
     @Operation(
             summary = "Создание нового Paste",
-            description = "Создание нового Paste с заданным временем и статусом"
-    )
-    public String createPaste(
-            @RequestBody PasteDTO pasteDTO,
-            @RequestParam(value = "time paste") TimePaste timePaste,
-            @RequestParam(value = "paste status") PasteStatus pasteStatus
+            description = "Время задается фиксированно: TEN_MIN, ONE_HOUR, THREE_HOUR, ONE_DAY, ONE_WEEK, ONE_MONTH INFINITY " +
+            "Типы статусов: PUBLIC, UNLISTED"
 
-    ) {
-        String response = pasteService.createPaste(pasteDTO, timePaste, pasteStatus);
-        return "http://my-awesome-pastebin.tld/" + response;
+    )
+    public String createPaste(@RequestBody CreatePaste createPaste) {
+        return pasteService.createPaste(createPaste);
     }
 
     @GetMapping(value = "/last-ten")

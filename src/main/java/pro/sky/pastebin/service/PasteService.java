@@ -1,15 +1,15 @@
 package pro.sky.pastebin.service;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Service;
-import pro.sky.pastebin.dto.PasteDTO;
+import pro.sky.pastebin.dto.CreatePaste;
 import pro.sky.pastebin.dto.PasteView;
 import pro.sky.pastebin.exception.BadRequestException;
 import pro.sky.pastebin.exception.NotFoundException;
 import pro.sky.pastebin.model.Paste;
 import pro.sky.pastebin.model.enums.PasteStatus;
-import pro.sky.pastebin.model.enums.TimePaste;
 import pro.sky.pastebin.repository.PasteRepository;
 
 import java.security.SecureRandom;
@@ -17,14 +17,16 @@ import java.time.Instant;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static pro.sky.pastebin.repository.specification.PasteSpecification.byBody;
-import static pro.sky.pastebin.repository.specification.PasteSpecification.byTitle;
+import static pro.sky.pastebin.repository.specification.PasteSpecification.*;
 
 @Service
 @Slf4j
 public class PasteService {
 
     private final PasteRepository pasteRepository;
+
+    @Value("${pastebin.url}")
+    private String address;
 
     public PasteService(PasteRepository pasteRepository) {
         this.pasteRepository = pasteRepository;
@@ -43,14 +45,12 @@ public class PasteService {
         return sb.toString();
     }
 
-    public String createPaste(PasteDTO pasteDTO, TimePaste timePaste, PasteStatus pasteStatus) {
-        if (pasteDTO == null) throw new BadRequestException("Entity is null");
-        Paste paste = pasteDTO.toPaste();
-        paste.setUrl(generateRandomUrl());
-        paste.setExpiredTime(Instant.now().plus(timePaste.getDuration()));
-        paste.setStatus(pasteStatus);
+    public String createPaste(CreatePaste createPaste) {
+        if (createPaste == null) throw new BadRequestException("Entity is null");
+        Paste paste = createPaste.toPaste();
+        paste.setUrl(address + generateRandomUrl());
         pasteRepository.save(paste);
-        log.info("Paste {} with expired time {} and status {} created ", pasteDTO, timePaste, pasteStatus);
+        log.info("Paste {} with expired time {} and status {} created ", createPaste, paste.getExpiredTime(), paste.getStatus());
         return paste.getUrl();
     }
 
@@ -78,7 +78,7 @@ public class PasteService {
         if ((title == null || title.isBlank()) && (body == null || body.isBlank()))
             throw new NotFoundException("No matches");
         List<PasteView> pasts = pasteRepository
-                .findAll(Specification.where(byTitle(title).and(byBody(body))))
+                .findAll(Specification.where(byTitle(title).and(byBody(body).and(byTime()).and(byStatus()))))
                 .stream()
                 .map(PasteView::fromPaste)
                 .collect(Collectors.toList());
@@ -86,5 +86,6 @@ public class PasteService {
         if (pasts.isEmpty()) throw new NotFoundException("Not found");
         return pasts;
     }
+
 
 }
