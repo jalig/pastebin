@@ -5,6 +5,7 @@ import org.springframework.util.StringUtils;
 import pro.sky.pastebin.model.Paste;
 import pro.sky.pastebin.model.enums.PasteStatus;
 
+import javax.persistence.criteria.Predicate;
 import java.time.Instant;
 
 public class PasteSpecification {
@@ -19,15 +20,16 @@ public class PasteSpecification {
         };
     }
 
-    public static Specification<Paste> byTime() {
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.greaterThanOrEqualTo(root.get("expiredTime"), Instant.now());
+
+    public static Specification<Paste> byTimeAndStatus() {
+        return (root, query, criteriaBuilder) -> {
+
+            Predicate expiredTime = criteriaBuilder.greaterThanOrEqualTo(root.get("expiredTime"), Instant.now());
+            Predicate status = criteriaBuilder.equal(root.get("status"), PasteStatus.PUBLIC);
+            return criteriaBuilder.and(expiredTime, status);
+        };
     }
 
-    public static Specification<Paste> byStatus() {
-        return (root, query, criteriaBuilder) ->
-                criteriaBuilder.equal(root.get("status"), PasteStatus.PUBLIC);
-    }
 
     public static Specification<Paste> byBody(String body) {
 

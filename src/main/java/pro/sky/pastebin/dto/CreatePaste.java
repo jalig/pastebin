@@ -1,6 +1,5 @@
 package pro.sky.pastebin.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Getter;
 import lombok.Setter;
@@ -16,9 +15,6 @@ import javax.persistence.Enumerated;
 @Schema(description = "Полная информация о Paste")
 public class CreatePaste {
 
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    @Schema(description = "Адрес", example = "url")
-    private String url;
     @Schema(description = "Тело", example = "body")
     private String body;
     @Schema(description = "Заголовок", example = "title")
@@ -33,7 +29,6 @@ public class CreatePaste {
 
     public Paste toPaste() {
         Paste paste = new Paste();
-        paste.setUrl(this.getUrl());
         paste.setBody(this.getBody());
         paste.setTitle(this.getTitle());
         paste.setExpiredTime(paste.getCreationTime().plus(expiredTime.getDuration()));

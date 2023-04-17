@@ -78,7 +78,7 @@ public class PasteService {
         if ((title == null || title.isBlank()) && (body == null || body.isBlank()))
             throw new NotFoundException("No matches");
         List<PasteView> pasts = pasteRepository
-                .findAll(Specification.where(byTitle(title).and(byBody(body).and(byTime()).and(byStatus()))))
+                .findAll(Specification.where(byTitle(title).and(byBody(body).and(byTimeAndStatus()))))
                 .stream()
                 .map(PasteView::fromPaste)
                 .collect(Collectors.toList());

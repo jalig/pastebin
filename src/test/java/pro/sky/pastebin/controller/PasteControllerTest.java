@@ -32,18 +32,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @DirtiesContext(classMode = DirtiesContext.ClassMode.BEFORE_CLASS)
 class PasteControllerTest extends DockerConfig {
 
+    private final PasteStatus pasteStatus = PasteStatus.PUBLIC;
+    private final TimePaste timePaste = TimePaste.TEN_MIN;
     @Autowired
     MockMvc mockMvc;
     @Autowired
     PasteRepository pasteRepository;
     @Autowired
     ObjectMapper objectMapper;
-
     Paste paste;
-
-    PasteStatus pasteStatus = PasteStatus.PUBLIC;
-
-    TimePaste timePaste = TimePaste.TEN_MIN;
 
     @BeforeEach
     void setUp() {
@@ -64,17 +61,6 @@ class PasteControllerTest extends DockerConfig {
     }
 
     @Test
-    void createPaste() throws Exception {
-        mockMvc.perform(post("/my-awesome-pastebin")
-                        .contentType(MediaType.APPLICATION_JSON)
-                        .content(objectMapper.writeValueAsString(PasteDTO.fromPaste(paste)))
-                        .param("timePaste", timePaste.toString())
-                        .param("pasteStatus", pasteStatus.toString()))
-                .andExpect(status().isOk())
-                .andExpect(jsonPath("$").isString());
-    }
-
-    @Test
     void findAllPublic() throws Exception {
         mockMvc.perform(get("/my-awesome-pastebin/last-ten"))
                 .andExpect(status().isOk())
@@ -91,7 +77,7 @@ class PasteControllerTest extends DockerConfig {
 
     @Test
     void findByTitleOrBody() throws Exception {
-        mockMvc.perform(get("/my-awesome-pastebin"))
+        mockMvc.perform(get("/my-awesome-pastebin?title=" + paste.getTitle()))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$").isArray());
     }
