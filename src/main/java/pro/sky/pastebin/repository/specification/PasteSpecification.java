@@ -20,7 +20,6 @@ public class PasteSpecification {
         };
     }
 
-
     public static Specification<Paste> byTimeAndStatus() {
         return (root, query, criteriaBuilder) -> {
 
@@ -29,7 +28,6 @@ public class PasteSpecification {
             return criteriaBuilder.and(expiredTime, status);
         };
     }
-
 
     public static Specification<Paste> byBody(String body) {
 
@@ -40,5 +38,4 @@ public class PasteSpecification {
             return criteriaBuilder.like(root.get("body"), "%" + body + "%");
         };
     }
-
 }

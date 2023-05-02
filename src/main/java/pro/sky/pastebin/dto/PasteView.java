@@ -18,7 +18,6 @@ public class PasteView {
     private String title;
 
 
-
     public static PasteView fromPaste(Paste paste) {
         PasteView dto = new PasteView();
         dto.setUrl(paste.getUrl());

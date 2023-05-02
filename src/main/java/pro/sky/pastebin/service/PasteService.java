@@ -64,7 +64,6 @@ public class PasteService {
         log.info("List of ten pastes loaded");
         return pasts;
 
-
     }
 
     public PasteView findByUrl(String url) {

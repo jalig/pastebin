@@ -23,7 +23,7 @@ public class PasteController {
     @Operation(
             summary = "Создание нового Paste",
             description = "Время задается фиксированно: TEN_MIN, ONE_HOUR, THREE_HOUR, ONE_DAY, ONE_WEEK, ONE_MONTH INFINITY " +
-            "Типы статусов: PUBLIC, UNLISTED"
+                    "Типы статусов: PUBLIC, UNLISTED"
 
     )
     public String createPaste(@RequestBody CreatePaste createPaste) {

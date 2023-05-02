@@ -10,12 +10,12 @@ import pro.sky.pastebin.exception.NotFoundException;
 public class NotFoundControllerAdvice {
 
     @ExceptionHandler(NotFoundException.class)
-    public ResponseEntity<?> notFound(){
+    public ResponseEntity<?> notFound() {
         return ResponseEntity.status(404).body("Not found");
     }
 
     @ExceptionHandler(BadRequestException.class)
-    public ResponseEntity<?> badLot(){
+    public ResponseEntity<?> badLot() {
         return ResponseEntity.status(400).build();
     }
 }
